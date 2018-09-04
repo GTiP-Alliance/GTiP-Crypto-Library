@@ -10,7 +10,8 @@ GTiP Crypto Library is a suite of post-quantum secure algorithms deployed within
 [Documentation](https://docs.gtipalliance.org/) |
 [Mailing List](https://gtipalliance.org/) 
 
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/qredo/Qredo-Crypto-Library.svg?columns=all)](https://waffle.io/qredo/Qredo-Crypto-Library)
+[![Waffle.io - Issues in progress](https://badge.waffle.io/GTiP-Alliance/Waffle.png?label=in%20progress&title=In%20Progress)](http://waffle.io/GTiP-Alliance/Waffle)
+
 ### License
 
 GTiP Crypto Library is licensed under the MIT License.
