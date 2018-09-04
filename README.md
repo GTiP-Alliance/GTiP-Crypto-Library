@@ -4,7 +4,7 @@
   <img src="./assets/Logo_final_transparent.png" alt="GTiP"/>
 </p>
 
-GTiP Crypto Library is a suite of post-quantum secure algorithms deployed within the Qredo cryptocurrency.
+GTiP Crypto Library is a suite of post-quantum secure algorithms deployed within the GTiP cryptocurrency.
 
 [Website](https://gtipalliance.org/) |
 [Documentation](https://docs.gtipalliance.org/) |
