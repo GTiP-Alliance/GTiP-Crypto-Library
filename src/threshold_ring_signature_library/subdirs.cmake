@@ -1,1 +1,1 @@
-add_subdirectory(src/qredo_ring)
+add_subdirectory(src/gtip_ring)
