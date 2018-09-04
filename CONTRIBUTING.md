@@ -8,20 +8,20 @@ Please note that we are a **very** international team so when you are communicat
 
 ## Contacting Us
 
-If you would like to contribute to this repository we'll need to send you an invitiation. You can let us know you'd like to join by submitting some details via our [our community portal](https://community.qredo.org/)
+If you would like to contribute to this repository we'll need to send you an invitiation. You can let us know you'd like to join by submitting some details via our [our community portal](https://community.gtipalliance.org/)
 
 We will also need you to sign up to these policies
 
 ## Issues, Features and Requests
 
 ### Questions
-Please don't create an issue to ask a question - the [community portal](https://community.qredo.org/) is the place to do that
+Please don't create an issue to ask a question - the [community portal](https://community.gtipalliance.org/) is the place to do that
 
 ### Suggestions
-If you have an idea for a feature or an improvement to Qredo discuss it on the community portal first and if it gets the thumbs up from the rest of the team go ahead and raise it as an issue. We like the Cucumber BDD style similar to this
+If you have an idea for a feature or an improvement to GTiP discuss it on the community portal first and if it gets the thumbs up from the rest of the team go ahead and raise it as an issue. We like the Cucumber BDD style similar to this
 
 ```
-GIVEN THAT: A suggestion is submitted
+GIVEN THAT: A suggestion is submitted via the community portal
     AND: It has been reviewed and agreed in the Community portal
     THEN: Go ahead and raise a ticket
     AND: Drink a cold one
@@ -32,7 +32,7 @@ If you have found a bug go-ahead and raise an issue but make sure that you inclu
 
 ## Contributing Code 
 
-We are following a gitflow process, [it is described in detail here](https://github.com/qredo/Qredo-Crypto-Library/wiki/VERSION-CONTROL)
+We are following a gitflow process
 
 ### Features
 
