@@ -1,11 +1,9 @@
-//Copyright (c) 2018 Global Telecom Inter-Payments Alliance Ltd
-
-package qredoring
+package qredo_ring
 
 // #include <stdio.h>
 // #include <stdlib.h>
 import "C"
-// import "unsafe"
+import "unsafe"
 
 //------------------------------------------
 
@@ -24,7 +22,7 @@ type parameters struct {
 	// security parameter
 	l uint;
 	// number of participants
-	numberOfParticipants uint;
+	number_of_participants uint;
 	// threshold number of participants
 	threshold uint;
 }
@@ -40,7 +38,7 @@ type parameters struct {
 //!
 // output public, private keyes
 func keygen(p parameters) (string, string){
-	return "public_key", "public_key"
+	return "public_key", "private_key"
 }
 
 //------------------------------------------
@@ -54,7 +52,7 @@ func keygen(p parameters) (string, string){
 //! \param secret_key  input  : the private key of the participant
 //! \param signature   output : the result signature buffer
 //!
-func participantSign(p parameters, message string, secretKey string) string{
+func participant_sign(p parameters, message string, secret_key string) string{
 	return "signature"
 }
 
@@ -68,7 +66,7 @@ func participantSign(p parameters, message string, secretKey string) string{
 //! \param participant_signatures input  : threshold-concatenated participants signatures
 //! \param signature              output : the ring leader signature
 //!
-func leaderSign(p  parameters, message string , participantSignatures string) string{
+func leader_sign(p  parameters, message string , participant_signatures string) string{
 	return "signature"
 }
 
@@ -83,7 +81,7 @@ func leaderSign(p  parameters, message string , participantSignatures string) st
 //! \param ring_public_key   input  : the ring public key
 //! \param result            output : true if given message was verified, false otherwise
 //!
-func verify(p parameters, message string , ringSignature string, ringPublicKey string) bool{
+func verify(p parameters, message string , ring_signature string, ring_public_key string) bool{
 	return true;
 }
 

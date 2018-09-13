@@ -1,8 +1,8 @@
-#ifndef QREDO_RING_API_H
-#define QREDO_RING_API_H
+#ifndef GTIP_RING_API_H
+#define GTIP_RING_API_H
 
 #ifdef __cplusplus
-namespace qredo_ring_api
+namespace gtip
 {
 #endif
 
@@ -42,7 +42,7 @@ namespace qredo_ring_api
 		unsigned int number_of_participants;
 		// threshold number of participants
 		unsigned int threshold;
-	} qredo_parameters;
+	} gtip_parameters;
 
 	//------------------------------------------
 
@@ -54,10 +54,10 @@ namespace qredo_ring_api
 	//! \param parameters  input  : the system parameters
 	//!
 	extern "C" int
-	qredo_ring_keygen(
+	gtip_ring_keygen(
 			unsigned char* public_key,
 			unsigned char* secret_key,
-			const qredo_parameters* parameters);
+			const gtip_parameters* parameters);
 
 	//------------------------------------------
 
@@ -71,9 +71,9 @@ namespace qredo_ring_api
 	//! \param secret_key       input  : the private key of the participant
 	//!
 	extern "C" int
-	qredo_ring_participant_sign(
+	gtip_ring_participant_sign(
 			unsigned char* signature,
-			const qredo_parameters* parameters,
+			const gtip_parameters* parameters,
 			const unsigned char* message,
 			const unsigned int message_len,
 			const unsigned char* secret_key);
@@ -90,9 +90,9 @@ namespace qredo_ring_api
 	//! \param participant_signatures input  : threshold-concatenated participants signatures, size is known
 	//!
 	extern "C" int
-	qredo_ring_leader_sign(
+	gtip_ring_leader_sign(
 			unsigned char* signature,
-			const qredo_parameters* parameters,
+			const gtip_parameters* parameters,
 			const unsigned char* message,
 			const unsigned int message_len,
 			const unsigned char* participant_signatures);
@@ -110,9 +110,9 @@ namespace qredo_ring_api
 	//! \param ring_public_key   input  : the ring public key
 	//!
 	extern "C" int
-	qredo_ring_verify(
+	gtip_ring_verify(
 			int* result,
-			const qredo_parameters* parameters,
+			const gtip_parameters* parameters,
 			const unsigned char* message,
 			const unsigned int message_len,
 			const unsigned char* ring_signature,
