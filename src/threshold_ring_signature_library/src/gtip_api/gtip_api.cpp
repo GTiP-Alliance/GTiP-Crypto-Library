@@ -2,18 +2,18 @@
 #include <string>
 #include <iostream>
 
-#include "qredo_ring.h"
+#include "gtip_api.h"
 
 using namespace std;
-using namespace qredo_ring_api;
+using namespace gtip;
 
 //------------------------------------------
 
 extern "C" int
-qredo_ring_keygen(
+gtip_ring_keygen(
         unsigned char* public_key,
         unsigned char* secret_key,
-		const qredo_parameters* parameters)
+		const gtip_parameters* parameters)
 {
 	return 0;
 }
@@ -21,9 +21,9 @@ qredo_ring_keygen(
 //------------------------------------------
 
 extern "C" int
-qredo_ring_participant_sign(
+gtip_ring_participant_sign(
         unsigned char* signature,
-        const qredo_parameters* parameters,
+        const gtip_parameters* parameters,
         const unsigned char* message,
         const unsigned int message_len,
         const unsigned char* secret_key)
@@ -34,9 +34,9 @@ qredo_ring_participant_sign(
 //------------------------------------------
 
 extern "C" int
-qredo_ring_leader_sign(
+gtip_ring_leader_sign(
         unsigned char* signature,
-        const qredo_parameters* parameters,
+        const gtip_parameters* parameters,
         const unsigned char* message,
         const unsigned int message_len,
         const unsigned char* participant_signatures)
@@ -47,9 +47,9 @@ qredo_ring_leader_sign(
 //------------------------------------------
 
 extern "C" int
-qredo_ring_verify(
+gtip_ring_verify(
 		int* result,
-        const qredo_parameters* parameters,
+        const gtip_parameters* parameters,
         const unsigned char* message,
         const unsigned int message_len,
         const unsigned char* ring_signature,
