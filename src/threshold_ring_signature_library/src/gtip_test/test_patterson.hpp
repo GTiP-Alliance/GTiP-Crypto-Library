@@ -31,7 +31,7 @@ TEST(TestDecoding, HandlesPatterson)
 			gtip::decoding::patterson(
 					ciphertext,
 					gc,
-					true);
+					false);
 
 		ASSERT_EQ(error_vector.length(), ciphertext.length());
 	}
