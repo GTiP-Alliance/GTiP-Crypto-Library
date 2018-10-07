@@ -5,7 +5,8 @@
 
 #include <vector>
 
-#include "gtip_api/gtip_api.h"
+#include <gtip_api/gtip_api.h>
+#include "goppa_code.hpp"
 
 namespace gtip
 {
@@ -18,24 +19,30 @@ namespace gtip
 			// of the underlying goppa code. See GTIP_ring.h
 			// for specifics.
 			//------------------------------------------
-			gtip::gtip_parameters m_p;
+			const gtip::gtip_parameters m_p;
+			//------------------------------------------
+			const gtip::goppa_code m_gc;
 			//------------------------------------------
 		public:
 			//------------------------------------------
 			typedef struct
 			{
+				// Q_i
 				NTL::mat_GF2 random_binary_inv_matrix;
+				// H_i == H_b from goppa code
 				NTL::mat_GF2 binary_parity_check_matrix;
+				// P_i
 				NTL::mat_GF2 random_permutation_matrix;
 			} private_key_t;
 			//------------------------------------------
 			typedef struct
 			{
+				// H_i^tilde
 				NTL::mat_GF2 random_matrix;
 			} public_key_t;
 			//------------------------------------------
 			keygen(
-					gtip::gtip_parameters& p);
+					const gtip::gtip_parameters& p);
 			//------------------------------------------
 			bool
 			compute_private_key(
@@ -53,6 +60,9 @@ namespace gtip
 			compute_ring_key(
 					std::vector<NTL::mat_GF2>& ring_key,
 					const NTL::mat_GF2& public_key);
+			//------------------------------------------
+			const goppa_code&
+			get_goppa_code() const;
 			//------------------------------------------
 	};	
 }

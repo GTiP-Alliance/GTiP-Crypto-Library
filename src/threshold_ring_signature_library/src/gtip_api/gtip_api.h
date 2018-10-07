@@ -35,7 +35,7 @@ namespace gtip
 		// minimum distance
 		unsigned int d;
 		// error correcting ability of underpinning code
-		unsigned int w;
+		unsigned int t;
 		// security parameter
 		unsigned int l;
 		// number of participants

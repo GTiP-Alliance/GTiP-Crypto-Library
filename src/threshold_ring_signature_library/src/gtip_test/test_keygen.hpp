@@ -3,10 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include <random>
-#include <algorithm>
-
-#include <gtip/keygen.hpp>
+#include <gtip/gtip.hpp>
 #include <gtip_api/gtip_api.h>
 
 //------------------------------------------
@@ -15,13 +12,20 @@ TEST(TestKeygen, HandlesKeygenConstructorInit)
 {	
 	try
 	{
+		// m * t = n - k
+		const unsigned long k = 8;
+		const unsigned long m = 4;
+		const unsigned long t = 2;
+		const unsigned long n = std::pow(2, m);
+
 		gtip::gtip_parameters parameters;
 		{
-			parameters.n = 3;
-			parameters.w = 2;
-			parameters.k = 2;
+			parameters.n = n;
+			parameters.t = t;
+			parameters.k = k;
 		}
 
+		gtip::context::init(k);
 		gtip::keygen keygen(parameters);
 
 		gtip::keygen::private_key_t private_key;

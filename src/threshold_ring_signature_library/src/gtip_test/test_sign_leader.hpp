@@ -3,7 +3,10 @@
 
 #include <gtest/gtest.h>
 
-//==================================================================
+#include <gtip/gtip.hpp>
+#include <gtip_api/gtip_api.h>
+
+//------------------------------------------
 
 TEST(TestSignLeader, HandlesSignLeaderConstructorInit)
 {
@@ -17,6 +20,6 @@ TEST(TestSignLeader, HandlesSignLeaderConstructorInit)
 	}
 }
 
-//==================================================================
+//------------------------------------------
 
 #endif
