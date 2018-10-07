@@ -23,6 +23,21 @@ using namespace gtip;
 //------------------------------------------
 
 goppa_code::goppa_code(
+		const gtip_parameters& parameters,
+		const bool compute_H_b,
+		const bool verbose) :
+				goppa_code(
+						// TODO check this
+						(unsigned long)std::round(log2(double(parameters.n))),
+						parameters.t,
+						parameters.n,
+						compute_H_b,
+						verbose)
+{}
+
+//------------------------------------------
+
+goppa_code::goppa_code(
 		const unsigned long m,
 		const unsigned long t) :
 				goppa_code(m, t, std::pow(2, m))
@@ -148,7 +163,7 @@ goppa_code::goppa_code(
 	{
 		NTL::vec_GF2E inv_eval_g;
 
-		for (auto eval_g : NTL::eval(this->m_g, this->m_support_set))
+		for (auto&& eval_g : NTL::eval(this->m_g, this->m_support_set))
 		{
 			inv_eval_g.append(NTL::inv(eval_g));
 		}
@@ -164,14 +179,14 @@ goppa_code::goppa_code(
 		NTL::mat_GF2E X;
 		X.SetDims(this->m_t, this->m_n);
 
-		for (int j = 0; j < this->m_n; ++j)
+		for (unsigned long j = 0; j < this->m_n; ++j)
 		{
-			X[0].put(j, inv_eval_g[j]);
+			X[0][j] =  inv_eval_g[j];
 			NTL::GF2E a_t = this->m_support_set[j];
 
-			for (int i = 1; i < this->m_t; ++i)
+			for (unsigned long i = 1; i < this->m_t; ++i)
 			{
-				X[i].put(j, a_t * inv_eval_g[j]);
+				X[i][j] = a_t * inv_eval_g[j];
 				a_t *= this->m_support_set[j];
 			}
 		}
@@ -188,7 +203,7 @@ goppa_code::goppa_code(
 		{
 			for (unsigned long j = 0; j <= i; ++j)
 			{
-				T[i].put(j, this->m_g[this->m_t - i + j]);
+				T[i][j] = this->m_g[this->m_t - i + j];
 			}
 		}
 
@@ -208,10 +223,9 @@ goppa_code::goppa_code(
 	// unfold H_a to create binary matrix H_b
 	if (this->m_compute_H_b == true)
 	{
-		NTL::mat_GF2 H_b;
-		H_b.SetDims(this->m_t * this->m_m, this->m_n);
+		this->m_H_b.SetDims(this->m_t * this->m_m, this->m_n);
 
-		const auto degree = this->m_H_a.get(0,0).degree();
+		const auto degree = this->m_m;
 
 		for (unsigned long i = 0; i < this->m_t; ++i)
 		{
@@ -225,14 +239,12 @@ goppa_code::goppa_code(
 					LOG(INFO) << "[" << i << "," << j << "] = " << p;
 				}
 
-				for (int k = 0; k < degree; ++k)
+				for (unsigned long z = 0; z < degree; ++z)
 				{
-					H_b[i * degree + k].put(j, l[k]);
+					this->m_H_b[i * degree + z][j] = l[z];
 				}
 			}
 		}
-
-		this->m_H_b = H_b;
 
 		if (this->m_verbose == true)
 		{
@@ -261,10 +273,10 @@ goppa_code::compute_support_set(
 			continue;
 		}
 
-		results = NTL::vec_GF2E();
-		results.append(p_zero);
-		results.append(p_one);
-		results.append(seed);
+		NTL::vec_GF2E tmp_results;
+		tmp_results.append(p_zero);
+		tmp_results.append(p_one);
+		tmp_results.append(seed);
 
 		NTL::GF2E tmp = seed;
 
@@ -282,11 +294,13 @@ goppa_code::compute_support_set(
 				break;
 			}
 
-			results.append(tmp);
+			tmp_results.append(tmp);
 		}
 
 		if (correct == true)
 		{
+			results.append(tmp_results);
+
 			return true;
 		}
 	}
@@ -313,6 +327,14 @@ const NTL::mat_GF2&
 goppa_code::H_b() const
 {
 	return this->m_H_b;
+}
+
+//------------------------------------------
+
+const unsigned long
+goppa_code::t() const
+{
+	return this->m_t;
 }
 
 //------------------------------------------

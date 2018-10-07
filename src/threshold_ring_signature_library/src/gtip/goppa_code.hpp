@@ -6,6 +6,8 @@
 #include <NTL/mat_GF2.h>
 #include <NTL/mat_GF2E.h>
 
+#include <gtip_api/gtip_api.h>
+
 #include "context.hpp"
 
 namespace gtip
@@ -22,7 +24,7 @@ namespace gtip
 			// with elements being polynomial functions of a
 			NTL::mat_GF2E m_H_a;
 			//------------------------------------------
-			// parity check matrix H_b of dimensions (m * t) x n,
+			// parity check matrix H_b of dimensions (m * t) x n = n - k,
 			// which is a block matrix with elements being 0's and 1's
 			NTL::mat_GF2 m_H_b;
 			//------------------------------------------
@@ -47,6 +49,11 @@ namespace gtip
 		public:
 			//------------------------------------------
 			goppa_code(
+					const gtip_parameters& parameters,
+					const bool compute_H_b = true,
+					const bool verbose = false);
+			//------------------------------------------
+			goppa_code(
 					const unsigned long m,
 					const unsigned long t,
 					const unsigned long n,
@@ -69,6 +76,8 @@ namespace gtip
 			const NTL::GF2EX& g() const;
 			//------------------------------------------
 			const NTL::vec_GF2E& support_set() const;
+			//------------------------------------------
+			const unsigned long t() const;
 			//------------------------------------------
 	};
 }

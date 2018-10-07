@@ -6,6 +6,7 @@ include_directories(${CMAKE_BINARY_DIR}/libntl/include
 					${GTEST_INCLUDE_DIR}
 					${GFLAGS_INCLUDE_DIR}
 					${GLOG_INCLUDE_DIR}
+					${CMAKE_BINARY_DIR}/libsodium/include
 					${CMAKE_HOME_DIRECTORY}/src/)
 
 add_executable(gtip_test ${SOURCES_CPP})
@@ -17,6 +18,7 @@ target_link_libraries(gtip_test
 	gflags
 	ntl
 	gmp
-	gtip)
+	gtip
+	sodium)
 
 install(TARGETS gtip_test RUNTIME DESTINATION bin)

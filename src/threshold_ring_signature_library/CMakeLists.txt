@@ -9,6 +9,7 @@ find_package(Threads REQUIRED)
 
 include(ExternalProject)
 
+#gmp
 ExternalProject_Add(libgmp
 	URL https://gmplib.org/download/gmp/gmp-6.1.0.tar.xz
 	DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/
@@ -17,10 +18,12 @@ ExternalProject_Add(libgmp
 	)
 
 add_library(gmp SHARED IMPORTED)
-set(GMP_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/libgmp/lib/${CMAKE_SHARED_LIBRARY_PREFIX}gmp${CMAKE_SHARED_LIBRARY_SUFFIX})
-set_target_properties(gmp PROPERTIES IMPORTED_LOCATION ${GMP_LIBRARY_PATH})
-install(FILES ${GMP_LIBRARY_PATH} DESTINATION lib)
+set(GMP_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/libgmp/lib)
+set(GMP_LIBRARY ${GMP_LIBRARY_PATH}/${CMAKE_SHARED_LIBRARY_PREFIX}gmp${CMAKE_SHARED_LIBRARY_SUFFIX})
+set_target_properties(gmp PROPERTIES IMPORTED_LOCATION ${GMP_LIBRARY})
+install(DIRECTORY ${GMP_LIBRARY_PATH}/ DESTINATION lib FILES_MATCHING PATTERN "${CMAKE_SHARED_LIBRARY_PREFIX}*")
 
+#ntl
 ExternalProject_Add(libntl
 	DEPENDS libgmp 
 	URL https://www.shoup.net/ntl/ntl-11.3.0.tar.gz
@@ -33,9 +36,10 @@ ExternalProject_Add(libntl
 
 add_library(ntl SHARED IMPORTED)
 add_dependencies(ntl libntl)
-set(NTL_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/libntl/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ntl${CMAKE_SHARED_LIBRARY_SUFFIX})
-set_target_properties(ntl PROPERTIES IMPORTED_LOCATION ${NTL_LIBRARY_PATH})
-install(FILES ${NTL_LIBRARY_PATH} DESTINATION lib)
+set(NTL_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/libntl/lib)
+set(NTL_LIBRARY ${NTL_LIBRARY_PATH}/${CMAKE_SHARED_LIBRARY_PREFIX}ntl${CMAKE_SHARED_LIBRARY_SUFFIX})
+set_target_properties(ntl PROPERTIES IMPORTED_LOCATION ${NTL_LIBRARY})
+install(DIRECTORY ${NTL_LIBRARY_PATH}/ DESTINATION lib FILES_MATCHING PATTERN "${CMAKE_SHARED_LIBRARY_PREFIX}*")
 
 # gtest
 ExternalProject_Add(googletest
@@ -45,13 +49,12 @@ ExternalProject_Add(googletest
 	)
 
 set(GTEST_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/gtest/include)
-set(GTEST_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/gtest/lib/${CMAKE_SHARED_LIBRARY_PREFIX}gtest${CMAKE_SHARED_LIBRARY_SUFFIX})
-set(GTEST_LIBRARY gtest)
-add_library(${GTEST_LIBRARY} SHARED IMPORTED)
-set_property(TARGET ${GTEST_LIBRARY} PROPERTY IMPORTED_LOCATION
-                ${GTEST_LIBRARY_PATH} )
-add_dependencies(${GTEST_LIBRARY} googletest)
-install(FILES ${GTEST_LIBRARY_PATH} DESTINATION lib)
+set(GTEST_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/gtest/lib)
+set(GTEST_LIBRARY ${GTEST_LIBRARY_PATH}/${CMAKE_SHARED_LIBRARY_PREFIX}gtest${CMAKE_SHARED_LIBRARY_SUFFIX})
+add_library(gtest SHARED IMPORTED)
+set_target_properties(gtest PROPERTIES IMPORTED_LOCATION ${GTEST_LIBRARY})
+add_dependencies(gtest googletest)
+install(DIRECTORY ${GTEST_LIBRARY_PATH}/ DESTINATION lib FILES_MATCHING PATTERN "${CMAKE_SHARED_LIBRARY_PREFIX}*")
 
 # gflags
 ExternalProject_Add(googleflags
@@ -60,16 +63,13 @@ ExternalProject_Add(googleflags
 	URL https://github.com/gflags/gflags/archive/v2.2.1.zip
 	)
 
-set(GOPPA_CODE_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/src/goppa_code)
 set(GFLAGS_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/gflags/include)
-set(GFLAGS_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/gflags/lib/${CMAKE_SHARED_LIBRARY_PREFIX}gflags${CMAKE_SHARED_LIBRARY_SUFFIX})
-set(GFLAGS_LIBRARY gflags)
-
-add_library(${GFLAGS_LIBRARY} SHARED IMPORTED)
-set_property(TARGET ${GFLAGS_LIBRARY} PROPERTY IMPORTED_LOCATION
-                ${GFLAGS_LIBRARY_PATH} )
-add_dependencies(${GFLAGS_LIBRARY} googleflags)
-install(FILES ${GFLAGS_LIBRARY_PATH} DESTINATION lib)
+set(GFLAGS_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/gflags/lib)
+set(GFLAGS_LIBRARY ${GFLAGS_LIBRARY_PATH}/${CMAKE_SHARED_LIBRARY_PREFIX}gflags${CMAKE_SHARED_LIBRARY_SUFFIX})
+add_library(gflags SHARED IMPORTED)
+set_target_properties(gflags PROPERTIES IMPORTED_LOCATION ${GFLAGS_LIBRARY})
+add_dependencies(gflags googleflags)
+install(DIRECTORY ${GFLAGS_LIBRARY_PATH}/ DESTINATION lib FILES_MATCHING PATTERN "${CMAKE_SHARED_LIBRARY_PREFIX}*")
 
 # glog
 ExternalProject_Add(googlelog
@@ -81,13 +81,27 @@ ExternalProject_Add(googlelog
 	)
 
 set(GLOG_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/glog/include)
-set(GLOG_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/glog/lib/${CMAKE_SHARED_LIBRARY_PREFIX}glog${CMAKE_SHARED_LIBRARY_SUFFIX})
-set(GLOG_LIBRARY glog)
-add_library(${GLOG_LIBRARY} SHARED IMPORTED)
-set_property(TARGET ${GLOG_LIBRARY} PROPERTY IMPORTED_LOCATION
-                ${GLOG_LIBRARY_PATH} )
-add_dependencies(${GLOG_LIBRARY} googlelog)
-install(FILES ${GLOG_LIBRARY_PATH} DESTINATION lib)
+set(GLOG_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR}/glog/lib)
+set(GLOG_LIBRARY ${GLOG_LIBRARY_PATH}/${CMAKE_SHARED_LIBRARY_PREFIX}glog${CMAKE_SHARED_LIBRARY_SUFFIX})
+add_library(glog SHARED IMPORTED)
+set_target_properties(glog PROPERTIES IMPORTED_LOCATION ${GLOG_LIBRARY})
+add_dependencies(glog googlelog)
+install(DIRECTORY ${GLOG_LIBRARY_PATH}/ DESTINATION lib FILES_MATCHING PATTERN "${CMAKE_SHARED_LIBRARY_PREFIX}*")
+
+#libsodium
+ExternalProject_Add(libsodium
+	URL https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz
+	DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
+	CONFIGURE_COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR}/libsodium-prefix/src/libsodium/ ./autogen.sh
+	BUILD_COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR}/libsodium-prefix/src/libsodium/ ./configure --prefix=${CMAKE_CURRENT_BINARY_DIR}/libsodium
+	INSTALL_COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR}/libsodium-prefix/src/libsodium/ make install
+	)
+
+add_library(sodium SHARED IMPORTED)
+set(LIBSODIUM_PATH ${CMAKE_CURRENT_BINARY_DIR}/libsodium/lib)
+set(LIBSODIUM ${LIBSODIUM_PATH}/${CMAKE_SHARED_LIBRARY_PREFIX}sodium${CMAKE_SHARED_LIBRARY_SUFFIX})
+set_target_properties(sodium PROPERTIES IMPORTED_LOCATION ${LIBSODIUM})
+install(DIRECTORY ${LIBSODIUM_PATH}/ DESTINATION lib FILES_MATCHING PATTERN "${CMAKE_SHARED_LIBRARY_PREFIX}*")
 
 include(subdirs.cmake)
 

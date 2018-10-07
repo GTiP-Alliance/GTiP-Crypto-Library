@@ -4,7 +4,6 @@
 
 #include "keygen.hpp"
 #include "context.hpp"
-#include "goppa_code.hpp"
 
 //------------------------------------------
 
@@ -13,11 +12,10 @@ using namespace gtip;
 //------------------------------------------
 
 keygen::keygen(
-	gtip::gtip_parameters& p) :
-		m_p{p}
-{
-	gtip::context::init(m_p.n);
-}
+	const gtip_parameters& p) :
+		m_p{p},
+		m_gc{p}
+{}
 
 //------------------------------------------
 
@@ -66,18 +64,18 @@ keygen::compute_private_key(
 {
 	try
 	{
-		const auto n = std::pow((unsigned long)2, (unsigned long)m_p.n);
-		goppa_code gc(m_p.n, m_p.w);
-		private_key.binary_parity_check_matrix = gc.H_b();
-		private_key.random_binary_inv_matrix = NTL::random_mat_GF2(n - m_p.k, n - m_p.k);
-
-		while(false == NTL::IsZero(NTL::determinant(private_key.random_binary_inv_matrix)))
+		private_key.binary_parity_check_matrix = m_gc.H_b();
+		private_key.random_binary_inv_matrix =
+				NTL::random_mat_GF2(m_p.n - m_p.k, m_p.n - m_p.k);
 		{
-			private_key.random_binary_inv_matrix =
-					NTL::random_mat_GF2(n - m_p.k, n - m_p.k);
+			while(true == NTL::IsZero(NTL::determinant(private_key.random_binary_inv_matrix)))
+			{
+				private_key.random_binary_inv_matrix =
+						NTL::random_mat_GF2(m_p.n - m_p.k, m_p.n - m_p.k);
+			}
 		}
 
-		std::vector<unsigned long> permutation(n, 0);
+		std::vector<unsigned long> permutation(m_p.n, 0);
 		std::iota(
 				permutation.begin(),
 				permutation.end(),
@@ -88,9 +86,9 @@ keygen::compute_private_key(
 				permutation.end(),
 				context::get_random_engine());
 
-		private_key.random_permutation_matrix = NTL::ident_mat_GF2(n);
+		private_key.random_permutation_matrix = NTL::ident_mat_GF2(m_p.n);
 
-		for(unsigned long j = 0; j < n; ++j)
+		for (unsigned long j = 0; j < m_p.n; ++j)
 		{
 			private_key.random_permutation_matrix[j] =
 					NTL::shift(
@@ -105,6 +103,14 @@ keygen::compute_private_key(
 		LOG(ERROR) << "Failed to compute_private_key : " << exp.what();
 		return false;
 	}
+}
+
+//------------------------------------------
+
+const goppa_code&
+keygen::get_goppa_code() const
+{
+	return m_gc;
 }
 
 //------------------------------------------

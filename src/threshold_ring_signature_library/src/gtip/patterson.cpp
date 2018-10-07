@@ -20,79 +20,129 @@ using namespace decoding;
 
 //------------------------------------------
 
-NTL::vec_GF2
+bool
 decoding::patterson(
 		const NTL::vec_GF2& ciphertext,
 		const goppa_code& gc,
+		NTL::vec_GF2& error_vector,
 		const bool verbose)
 {
 	return decoding::patterson(
 			ciphertext,gc.H_a(),
 			gc.g(),
 			gc.support_set(),
+			error_vector,
 			verbose);
 }
 
 //------------------------------------------
 
-NTL::vec_GF2
+bool
+decoding::patterson(
+		const NTL::GF2EX& S_X,
+		const goppa_code& gc,
+		NTL::vec_GF2& error_vector,
+		const bool verbose)
+{
+	return decoding::patterson(
+			S_X,
+			gc.g(),
+			gc.support_set(),
+			error_vector,
+			verbose);
+}
+
+//------------------------------------------
+
+bool
 decoding::patterson(
 		const NTL::vec_GF2& ciphertext,
 		const NTL::mat_GF2E& H_a,
 		const NTL::GF2EX& g,
 		const NTL::vec_GF2E& support_set,
+		NTL::vec_GF2& error_vector,
 		const bool verbose)
 {
-	static const auto p_zero = NTL::GF2(0);
-	static const auto p_one = NTL::GF2(1);
-
 	if (ciphertext.length() != H_a.NumCols())
 	{
-		LOG(ERROR) << "ciphertext length should be equal to H_a columns";
-		throw std::invalid_argument("failed to patterson");
+		if (verbose == true)
+		{
+			LOG(ERROR) << "ciphertext length should be equal to H_a columns";
+		}
+
+		return false;
 	}
 
 	// Step 1: calculate syndrome polynomial S(X) = c x H^t
 	NTL::GF2EX S_X;
 	{
-		// embedd ciphertext into a mat_GF2E
-		NTL::mat_GF2E ciphertext_mat;
-		ciphertext_mat.SetDims(1, ciphertext.length());
-
-		unsigned long i = 0;
-
-		for (auto& element : ciphertext_mat(1))
-		{
-			element.LoopHole() = ciphertext[i];
-			++i;
-		}
-
 		NTL::mat_GF2E S;
-		NTL::mul(
-				S,
-				ciphertext_mat,
-				NTL::transpose(H_a));
-
-		if (verbose == true)
 		{
-			LOG(INFO) << "ciphertext = " << ciphertext;
-			LOG(INFO) << "S = y * H_a^T " << S;
-		}
+			// embedd ciphertext into a mat_GF2E
+			NTL::mat_GF2E ciphertext_mat;
+			{
+				unsigned long i = 0;
+				ciphertext_mat.SetDims(1, ciphertext.length());
+
+				for (auto& element : ciphertext_mat(1))
+				{
+					element.LoopHole() = ciphertext[i];
+					++i;
+				}
+			}
+			NTL::mul(
+					S,
+					ciphertext_mat,
+					NTL::transpose(H_a));
+		};
 
 		const auto& S_row = S[0];
+		const unsigned long S_row_length = S_row.length();
 
-		S_X.SetLength(S_row.length());
+		S_X.SetLength(S_row_length);
 
-		for (int i = 0; i < S_row.length(); ++i)
+		for (unsigned long i = 0; i < S_row_length; ++i)
 		{
-			const auto tmp = S_row[i];
 			S_X[i] = S_row[i];
 		}
 
 		if (verbose == true)
 		{
+			LOG(INFO) << "ciphertext = " << ciphertext;
+			LOG(INFO) << "S = y * H_a^T " << S;
 			LOG(INFO) << "S_X = " << S_X;
 		}
+	}
+
+	// Step 2: T = S^-1 (mod g)
+	// Step 3: sqrt(T + X)
+	// Step 4:
+	return patterson(
+			S_X,
+			g,
+			support_set,
+			error_vector,
+			verbose);
+}
+
+//------------------------------------------
+
+bool
+decoding::patterson(
+		const NTL::GF2EX& S_X,
+		const NTL::GF2EX& g,
+		const NTL::vec_GF2E& support_set,
+		NTL::vec_GF2& error_vector,
+		const bool verbose)
+{
+	if (is_syndrome_valid(S_X) == false)
+	{
+		if (verbose == true)
+		{
+			LOG(ERROR) << "invalid syndrome S_X = " << S_X;
+		}
+
+		return false;
 	}
 
 	// Step 2: T = S^-1 (mod g)
@@ -102,6 +152,11 @@ decoding::patterson(
 				S_X,
 				g,
 				T);
+
+		if (T.rep.length() == 0)
+		{
+			return false;
+		}
 
 		X.SetLength(T.rep.length());
 		X[1] = NTL::GF2E(1);
@@ -115,10 +170,8 @@ decoding::patterson(
 	}
 
 	// Step 3: sqrt(T + X)
-	NTL::GF2EX t;
+	const NTL::GF2EX t = NTL::sqr(T + X);
 	{
-		t = NTL::sqr(T + X);
-
 		if (verbose == true)
 		{
 			LOG(INFO) << "t = NTL::sqr(T + X) = " << t;
@@ -126,7 +179,7 @@ decoding::patterson(
 	}
 
 	// Step 4:
-	NTL::vec_GF2 error_vector;
+	// compute error vector
 	{
 		NTL::GF2EX Ax, Bx;
 		NTL::vec_GF2E roots;
@@ -137,13 +190,6 @@ decoding::patterson(
 				Ax);
 
 		const NTL::GF2EX sigma_x = (Ax * Ax) + (Bx * Bx) * X;
-
-		if (verbose == true)
-		{
-			LOG(INFO) << "Ax = " << Ax;
-			LOG(INFO) << "Bx = " << Bx;
-			LOG(INFO) << "sigma_x = (Ax * Ax) + (Bx * Bx) * X = " << sigma_x;
-		}
 
 		for (const auto& s : support_set)
 		{
@@ -164,13 +210,49 @@ decoding::patterson(
 
 		if (verbose == true)
 		{
+			LOG(INFO) << "Ax = " << Ax;
+			LOG(INFO) << "Bx = " << Bx;
+			LOG(INFO) << "sigma_x = " << sigma_x;
 			LOG(INFO) << "roots = " << roots;
 			LOG(INFO) << "error_vector = " << error_vector;
 		}
 	}
 
-	return error_vector;
+	return true;
 }
+
+//------------------------------------------
+
+bool
+decoding::is_syndrome_valid(
+		const NTL::GF2EX& S_X)
+{
+	if (NTL::IsZero(NTL::LeadCoeff(S_X)) == true)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+//------------------------------------------
+
+unsigned long
+decoding::number_of_errors(
+		const NTL::vec_GF2& error_vector)
+{
+	unsigned long number_of_errors = 0;
+
+	for (const auto& e: error_vector)
+	{
+		if (e == p_one)
+		{
+			++number_of_errors;
+		}
+	}
+
+	return number_of_errors;
+};
 
 //------------------------------------------
 
@@ -181,7 +263,7 @@ decoding::correct_ciphertext(
 {
 	NTL::vec_GF2 tmp = ciphertext;
 
-	decoding::correct_ciphertext(
+	decoding::correct_ciphertext_inplace(
 			tmp, error_vector);
 
 	return tmp;
@@ -190,7 +272,7 @@ decoding::correct_ciphertext(
 //------------------------------------------
 
 void
-decoding::correct_ciphertext(
+decoding::correct_ciphertext_inplace(
 		NTL::vec_GF2& ciphertext,
 		const NTL::vec_GF2& error_vector)
 {
